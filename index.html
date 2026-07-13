@@ -59,7 +59,7 @@
     /* ── CTA DECK BUTTON — Click.png on the palm, JS-controlled visibility ── */
     #deck-cta{
       position:absolute;
-      left:29%;top:32%;
+      left:29%;top:34%;
       margin-left:-50px;margin-top:-50px;
       text-decoration:none;display:block;
       opacity:0;pointer-events:none;
@@ -72,6 +72,7 @@
     #deck-cta:hover{filter:drop-shadow(0 0 28px rgba(255,255,255,.6));}
     .cta-img{width:100px;height:100px;display:block;}
     @keyframes ctaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .cta-text{display:none;}
 
     /* ── SOCIAL ICONS (loader overlay, top-right) ── */
     @keyframes socialIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
@@ -110,10 +111,20 @@
         background:#000 !important;
       }
       #deck-cta{
-        left:38%;top:32%;bottom:auto;
-        margin-left:-45px;margin-top:-45px;
+        left:35%;top:44%;bottom:auto;
+        margin-left:0;margin-top:0;
+        transform:translateX(-50%);
       }
-      .cta-img{width:90px;height:90px;}
+      .cta-img{display:none !important;}
+      .cta-text{
+        display:block;
+        font-family:'Space Grotesk',sans-serif;
+        font-size:.75rem;font-weight:600;
+        letter-spacing:.18em;text-transform:lowercase;
+        color:#fff;
+        text-shadow:0 0 12px rgba(0,240,255,.9),0 0 24px rgba(0,240,255,.5);
+        white-space:nowrap;
+      }
       #social-icons{top:16px;right:16px;gap:9px;}
       .soc-icon{width:40px;height:40px;border-radius:11px;}
     }
@@ -369,7 +380,7 @@
   <!-- LOADER: maintenance video plays immediately, CTA floats over hand-splash area -->
   <div id="loader">
     <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" loop fetchpriority="high"></video>
-    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto" loop></video>
+    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline webkit-playsinline preload="auto" loop></video>
 
     <!-- Social icons: Facebook + Instagram — top right corner -->
     <div id="social-icons">
@@ -396,9 +407,10 @@
       </a>
     </div>
 
-    <!-- Deck CTA — image, appears after hand rises, floats near Flow's palm -->
+    <!-- Deck CTA — image on desktop, text-only on mobile -->
     <a id="deck-cta" href="https://canva.link/openflow-deck" target="_blank" rel="noopener noreferrer" aria-label="View Openflow Deck">
       <img class="cta-img" src="Click.png" alt="Click here — View Openflow Deck" draggable="false" />
+      <span class="cta-text">click here</span>
     </a>
   </div>
 
@@ -692,9 +704,36 @@
     if(isMobile){
       applyMobileVideoStyle(maintMob);
       if(maintVid) maintVid.style.display = 'none';
-      maintMob.play().catch(function(){});
+
+      function tryPlayMob(){
+        if(maintMob && maintMob.paused){
+          maintMob.play().catch(function(){});
+        }
+      }
+
+      tryPlayMob();
+
+      /* iOS often blocks autoplay until first touch — retry on interaction */
+      document.addEventListener('touchstart', tryPlayMob, { once: true, passive: true });
+
+      /* Back/forward cache (user hits back button): restart */
+      window.addEventListener('pageshow', function(e){
+        if(e.persisted || (maintMob && maintMob.paused)) tryPlayMob();
+      }, { passive: true });
+
+      /* Tab switch back — resume if paused */
+      document.addEventListener('visibilitychange', function(){
+        if(!document.hidden) tryPlayMob();
+      }, { passive: true });
+
     } else {
       if(maintVid) maintVid.play().catch(function(){});
+
+      window.addEventListener('pageshow', function(e){
+        if(e.persisted || (maintVid && maintVid.paused)){
+          maintVid.play().catch(function(){});
+        }
+      }, { passive: true });
     }
   })();
 
