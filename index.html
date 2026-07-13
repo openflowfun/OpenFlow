@@ -72,6 +72,14 @@
     #deck-cta:hover{filter:drop-shadow(0 0 28px rgba(255,255,255,.6));}
     .cta-img{width:100px;height:100px;display:block;}
     @keyframes ctaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    /* Mobile palm-tracking — stays tightly within palm, ±3px only, 1.5s matches display window */
+    @keyframes ctaFloatMob{
+      0%   {transform:translateX(-50%) translateY(0px)}
+      25%  {transform:translateX(-50%) translateY(-2px)}
+      50%  {transform:translateX(-50%) translateY(-3px)}
+      75%  {transform:translateX(-50%) translateY(-1px)}
+      100% {transform:translateX(-50%) translateY(0px)}
+    }
     .cta-text{display:none;}
 
     /* ── SOCIAL ICONS (loader overlay, top-right) ── */
@@ -111,9 +119,9 @@
         background:#000 !important;
       }
       #deck-cta{
-        left:35%;top:44%;bottom:auto;
+        left:35%;top:46%;bottom:auto;
         margin-left:0;margin-top:0;
-        transform:translateX(-50%);
+        animation:ctaFloatMob 2.5s ease-in-out forwards;
       }
       .cta-img{display:none !important;}
       .cta-text{
@@ -744,7 +752,7 @@
     var cta = document.getElementById('deck-cta');
     if(!vid || !cta) return;
 
-    var SHOW_BEFORE_END = 3; // seconds before the loop resets to show the logo
+    var SHOW_BEFORE_END = 2.5; // seconds before the loop resets to show the logo
 
     var showTime      = null;
     var prevTime      = 0;
@@ -765,6 +773,12 @@
       if(ctaVisible) return;
       ctaVisible    = true;
       shownThisLoop = true;
+      /* On mobile, restart palm-tracking animation from frame 0 each cycle */
+      if(isMobile){
+        cta.style.animation = 'none';
+        void cta.offsetHeight; // force reflow so browser registers the reset
+        cta.style.animation = 'ctaFloatMob 2.5s ease-in-out forwards';
+      }
       cta.style.transition    = 'opacity 0.5s ease';
       cta.style.opacity       = '1';
       cta.style.pointerEvents = 'auto';
