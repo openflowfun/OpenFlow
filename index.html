@@ -49,20 +49,49 @@
 
     /* LOADER */
     #loader{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:99999}
-    #logo-vid,#maint-vid,#maint-vid-mob{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-    #maint-vid{opacity:0;transition:opacity .85s ease}
-    #maint-vid-mob{opacity:0;transition:opacity .85s ease;display:none}
+    #maint-vid,#maint-vid-mob{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+    #maint-vid-mob{display:none}
+
+    /* ── CTA DECK BUTTON (image) ── */
+    #deck-cta{
+      position:absolute;left:16%;top:22%;z-index:20;
+      text-decoration:none;display:block;
+      opacity:0;transform:translateY(20px) scale(.9);
+      animation:ctaReveal .7s cubic-bezier(.34,1.56,.64,1) 2.2s forwards,ctaFloat 4.5s ease-in-out 2.9s infinite;
+      filter:drop-shadow(0 0 24px rgba(0,136,255,.5));
+      transition:filter .35s;
+    }
+    #deck-cta:hover{filter:drop-shadow(0 0 44px rgba(0,240,255,.78));}
+    .cta-img{width:150px;height:150px;display:block;border-radius:50%;transition:transform .3s;}
+    #deck-cta:hover .cta-img{transform:scale(1.07);}
+    @keyframes ctaReveal{to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes ctaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+    /* ── SOCIAL ICONS (loader overlay, top-right) ── */
+    #social-icons{
+      position:absolute;top:22px;right:22px;z-index:30;
+      display:flex;gap:11px;
+    }
+    .soc-icon{
+      display:flex;align-items:center;justify-content:center;
+      width:46px;height:46px;border-radius:13px;
+      text-decoration:none;
+      transition:transform .25s,box-shadow .25s,background .25s;
+    }
+    .soc-icon:hover{transform:scale(1.11);}
+    .fb-icon{
+      background:rgba(24,119,242,.16);
+      border:1px solid rgba(24,119,242,.38);
+    }
+    .fb-icon:hover{background:rgba(24,119,242,.32);box-shadow:0 0 24px rgba(24,119,242,.5);}
+    .ig-icon{
+      background:rgba(225,48,108,.12);
+      border:1px solid rgba(225,48,108,.32);
+    }
+    .ig-icon:hover{background:rgba(225,48,108,.28);box-shadow:0 0 24px rgba(225,48,108,.5);}
 
     /* ── MOBILE LOADER OVERRIDES (≤768px) ── */
     @media(max-width:768px){
-      /* contain = show full video regardless of its aspect ratio, no cropping ever */
-      #logo-vid{
-        inset:0 !important; position:absolute !important;
-        width:100% !important; height:100% !important;
-        transform:none !important;
-        object-fit:contain !important;
-        background:#000 !important;
-      }
       #maint-vid{ display:none !important; }
       #maint-vid-mob{
         display:block !important;
@@ -72,6 +101,20 @@
         object-fit:contain !important;
         background:#000 !important;
       }
+      #deck-cta{
+        left:50%;top:auto;bottom:22%;
+        animation:ctaRevealMob .7s cubic-bezier(.34,1.56,.64,1) 2.2s forwards,ctaFloatMob 4.5s ease-in-out 2.9s infinite;
+      }
+      @keyframes ctaRevealMob{
+        from{opacity:0;transform:translateX(-50%) translateY(20px) scale(.9)}
+        to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+      }
+      @keyframes ctaFloatMob{
+        0%,100%{transform:translateX(-50%) translateY(0)}
+        50%{transform:translateX(-50%) translateY(-9px)}
+      }
+      #social-icons{top:16px;right:16px;gap:9px;}
+      .soc-icon{width:40px;height:40px;border-radius:11px;}
     }
 
     /* FLOW VIDEO — inside iMac screen */
@@ -288,15 +331,13 @@
 
     /* ── MOBILE: maintenance video fully visible ── */
     @media(max-width:768px){
-      /* Switch from cover→contain so full character + text shows */
+      /* contain = no cropping — full character + text visible */
       #maint-vid{
         object-fit:contain;
-        background:#000;          /* clean black surround */
+        background:#000;
         width:100%; height:100%;
         top:0; left:0;
       }
-      /* Logo intro stays cover (fullscreen splash is fine) */
-      #logo-vid{ object-fit:cover; }
     }
 
     @media(max-width:900px){
@@ -323,11 +364,40 @@
 </head>
 <body>
 
-  <!-- LOADER: logo intro → maintenance (desktop or mobile version) -->
+  <!-- LOADER: maintenance video plays immediately, CTA floats over hand-splash area -->
   <div id="loader">
-    <video id="logo-vid"     src="OpenFlow_LogoVid.mp4"      autoplay muted playsinline preload="auto"></video>
-    <video id="maint-vid"    src="UnderMaintenance.mp4"      muted playsinline preload="auto" loop></video>
-    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" muted playsinline preload="auto" loop></video>
+    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" loop></video>
+    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto" loop></video>
+
+    <!-- Social icons: Facebook + Instagram — top right corner -->
+    <div id="social-icons">
+      <a href="https://www.facebook.com/openflow.fun" class="soc-icon fb-icon" target="_blank" rel="noopener noreferrer" aria-label="Openflow on Facebook">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="#1877F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </a>
+      <a href="https://www.instagram.com/openflow.fun/" class="soc-icon ig-icon" target="_blank" rel="noopener noreferrer" aria-label="Openflow on Instagram">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#igGrad)" stroke-width="2" fill="none"/>
+          <circle cx="12" cy="12" r="4" stroke="url(#igGrad)" stroke-width="2" fill="none"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="url(#igGrad)"/>
+          <defs>
+            <linearGradient id="igGrad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f09433"/>
+              <stop offset="25%" stop-color="#e6683c"/>
+              <stop offset="50%" stop-color="#dc2743"/>
+              <stop offset="75%" stop-color="#cc2366"/>
+              <stop offset="100%" stop-color="#bc1888"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Deck CTA — image, appears after hand rises, floats near Flow's palm -->
+    <a id="deck-cta" href="https://canva.link/openflow-deck" target="_blank" rel="noopener noreferrer" aria-label="View Openflow Deck">
+      <img class="cta-img" src="Click.png" alt="Click here — View Openflow Deck" draggable="false" />
+    </a>
   </div>
 
   <!-- NAV -->
@@ -613,9 +683,8 @@
   </footer>
 
   <script>
-  /* ── STEP 1: LOADER — logo then maintenance video ── */
+  /* ── STEP 1: LOADER — maintenance video plays immediately ── */
   (function(){
-    var logoVid  = document.getElementById('logo-vid');
     var maintVid = document.getElementById('maint-vid');
     var maintMob = document.getElementById('maint-vid-mob');
     var isMobile = window.matchMedia('(max-width:768px)').matches;
@@ -633,24 +702,69 @@
     }
 
     if(isMobile){
-      applyMobileVideoStyle(logoVid);
       applyMobileVideoStyle(maintMob);
+      if(maintVid) maintVid.style.display = 'none';
+      maintMob.play().catch(function(){});
+    } else {
+      if(maintVid) maintVid.play().catch(function(){});
+    }
+  })();
+
+  /* ── STEP 1B: CTA — fade out on loop, fade in 3s after hand rises ── */
+  (function(){
+    var isMobile = window.matchMedia('(max-width:768px)').matches;
+    var vid = document.getElementById(isMobile ? 'maint-vid-mob' : 'maint-vid');
+    var cta = document.getElementById('deck-cta');
+    if(!vid || !cta) return;
+
+    /*
+     * ⏱  HAND_RAISE_TIME — seconds into each loop when Flow's hand starts rising.
+     *    Open the video in any player, find the moment the hand lifts, note the timestamp.
+     *    Default: 1.4 s  (adjust as needed)
+     *
+     * ⏱  HAND_SHOW_DELAY — milliseconds to wait AFTER the hand reaches HAND_RAISE_TIME
+     *    before fading the CTA in. Default: 3000 ms (3 seconds).
+     */
+    var HAND_RAISE_TIME  = 1.4;
+    var HAND_SHOW_DELAY  = 3000;
+
+    var prevTime    = 0;
+    var ctaHidden   = false;
+    var ready       = false; // true once the initial CSS reveal animation has finished
+    var showTimer   = null;  // pending setTimeout for delayed re-show
+
+    // Initial reveal runs for ~3 s (2.2 s delay + 0.7 s duration + small buffer)
+    setTimeout(function(){ ready = true; }, 3100);
+
+    function hideCTA(){
+      if(ctaHidden || !ready) return;
+      // Cancel any pending show timer (loop restarted before delay completed)
+      if(showTimer){ clearTimeout(showTimer); showTimer = null; }
+      ctaHidden = true;
+      cta.style.transition    = 'opacity 0.45s ease';
+      cta.style.opacity       = '0';
+      cta.style.pointerEvents = 'none';
     }
 
-    function showMaintenance(){
-      logoVid.style.transition = 'opacity .85s ease';
-      logoVid.style.opacity    = '0';
-      var target = isMobile ? maintMob : maintVid;
-      if(isMobile) applyMobileVideoStyle(target); /* re-apply before fade-in */
-      target.style.opacity = '1';
-      target.play().catch(function(){});
+    function showCTA(){
+      showTimer = null;
+      if(!ctaHidden) return;
+      ctaHidden = false;
+      cta.style.transition    = 'opacity 0.75s ease';
+      cta.style.opacity       = '1';
+      cta.style.pointerEvents = 'auto';
     }
 
-    if(logoVid){
-      logoVid.addEventListener('ended', showMaintenance);
-      logoVid.addEventListener('error', showMaintenance);
-    }
-    setTimeout(showMaintenance, 9000);
+    vid.addEventListener('timeupdate', function(){
+      var t = vid.currentTime;
+      // Loop detected: time jumped backward by > 0.5 s
+      if(prevTime > 0.8 && t < prevTime - 0.5) hideCTA();
+      // Hand rising: schedule re-show HAND_SHOW_DELAY ms after reaching the target timestamp
+      if(ctaHidden && !showTimer && t >= HAND_RAISE_TIME){
+        showTimer = setTimeout(showCTA, HAND_SHOW_DELAY);
+      }
+      prevTime = t;
+    });
   })();
 
   /* ── STEP 2: NAV SOLID ON SCROLL ── */
