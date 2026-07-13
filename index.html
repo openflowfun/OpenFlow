@@ -87,7 +87,8 @@
     #social-icons{
       position:absolute;top:22px;right:22px;z-index:30;
       display:flex;gap:11px;
-      opacity:0;animation:socialIn .45s ease .25s forwards;
+      opacity:0;pointer-events:none;
+      transition:opacity 0.5s ease;
     }
     .soc-icon{
       display:flex;align-items:center;justify-content:center;
@@ -768,6 +769,8 @@
     vid.addEventListener('durationchange',  calcShowTime);
     calcShowTime();
 
+    var socialEl = document.getElementById('social-icons');
+
     /* ── Smooth fade-in ── */
     function showCTA(){
       if(ctaVisible) return;
@@ -782,6 +785,11 @@
       cta.style.transition    = 'opacity 0.5s ease';
       cta.style.opacity       = '1';
       cta.style.pointerEvents = 'auto';
+      /* Show social icons in sync with CTA */
+      if(socialEl){
+        socialEl.style.opacity       = '1';
+        socialEl.style.pointerEvents = 'auto';
+      }
     }
 
     /* ── Instant snap-off on loop reset ── */
@@ -792,6 +800,12 @@
       cta.style.transition    = 'none';
       cta.style.opacity       = '0';
       cta.style.pointerEvents = 'none';
+      /* Hide social icons instantly in sync with CTA */
+      if(socialEl){
+        socialEl.style.transition    = 'none';
+        socialEl.style.opacity       = '0';
+        socialEl.style.pointerEvents = 'none';
+      }
     }
 
     vid.addEventListener('timeupdate', function(){
