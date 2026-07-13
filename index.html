@@ -10,8 +10,9 @@
   <meta name="theme-color" content="#1a0b2e" />
 
   <!-- ── Favicon &amp; App Icons ─────────────────────────── -->
-  <link rel="icon" href="openflow-transparent-logo.png" type="image/png" />
-  <link rel="apple-touch-icon" href="openflow-transparent-logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="openflow-transparent-logo.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="openflow-transparent-logo.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="openflow-transparent-logo.png?v=2" />
 
   <!-- ── Open Graph — Facebook, Instagram, LinkedIn, WhatsApp ── -->
   <meta property="og:title" content="Openflow — Build Anything Digital" />
@@ -368,8 +369,8 @@
 
   <!-- LOADER: maintenance video plays immediately, CTA floats over hand-splash area -->
   <div id="loader">
-    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" loop fetchpriority="high"></video>
-    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto" loop></video>
+    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" fetchpriority="high"></video>
+    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto"></video>
 
     <!-- Social icons: Facebook + Instagram — top right corner -->
     <div id="social-icons">
@@ -698,26 +699,21 @@
     }
   })();
 
-  /* ── STEP 1B: CTA — appears 0.25s before each loop end (hand final wave), hides on loop reset ── */
+  /* ── STEP 1B: CTA — fades in 0.25s before video ends, holds 6s on last frame, snaps off, loops ── */
   (function(){
     var isMobile = window.matchMedia('(max-width:768px)').matches;
     var vid = document.getElementById(isMobile ? 'maint-vid-mob' : 'maint-vid');
     var cta = document.getElementById('deck-cta');
     if(!vid || !cta) return;
 
-    /*
-     * ⏱  SHOW_BEFORE_END — seconds before the video loop resets at which to show the logo.
-     *    0.25 = logo appears 0.25 s before the hand movement fully ends each cycle.
-     *    Increase this number to show it earlier in the wave phase.
-     */
-    var SHOW_BEFORE_END = 0.25;
+    var SHOW_BEFORE_END = 0.25; // seconds before end to fade logo in
+    var HOLD_MS         = 6000; // ms to hold last frame with logo visible
 
-    var showTime      = null;  // vid.duration - SHOW_BEFORE_END, set once metadata loads
-    var prevTime      = 0;
+    var showTime      = null;
     var ctaVisible    = false;
     var shownThisLoop = false;
+    var holdTimer     = null;
 
-    /* ── Compute showTime from actual video duration (works even if already loaded) ── */
     function calcShowTime(){
       if(vid.duration && isFinite(vid.duration)){
         showTime = Math.max(0, vid.duration - SHOW_BEFORE_END);
@@ -725,9 +721,9 @@
     }
     vid.addEventListener('loadedmetadata', calcShowTime);
     vid.addEventListener('durationchange',  calcShowTime);
-    calcShowTime(); // immediate if metadata already cached
+    calcShowTime();
 
-    /* ── Fade in ── */
+    /* ── Smooth fade-in ── */
     function showCTA(){
       if(ctaVisible) return;
       ctaVisible    = true;
@@ -737,30 +733,32 @@
       cta.style.pointerEvents = 'auto';
     }
 
-    /* ── Fade out ── */
-    function hideCTA(fast){
-      if(!ctaVisible) return;
-      ctaVisible = false;
-      cta.style.transition    = fast ? 'opacity 0.2s ease' : 'opacity 0.5s ease';
+    /* ── Instant snap-off, no fade ── */
+    function hideCTAInstant(){
+      ctaVisible    = false;
+      shownThisLoop = false;
+      cta.style.transition    = 'none';
       cta.style.opacity       = '0';
       cta.style.pointerEvents = 'none';
     }
 
+    /* Show logo 0.25s before natural end */
     vid.addEventListener('timeupdate', function(){
-      var t = vid.currentTime;
-
-      /* Loop detected: time jumped backward — reset for the new cycle */
-      if(prevTime > 0.5 && t < prevTime - 0.5){
-        shownThisLoop = false;
-        hideCTA(true); // snap away instantly on loop so next appearance feels fresh
-      }
-
-      /* Show the logo at SHOW_BEFORE_END seconds before the loop end */
-      if(!shownThisLoop && showTime !== null && t >= showTime){
+      if(!shownThisLoop && showTime !== null && vid.currentTime >= showTime){
         showCTA();
       }
+    });
 
-      prevTime = t;
+    /* Video ends → freeze on last frame, hold 6s, then snap logo off and restart */
+    vid.addEventListener('ended', function(){
+      showCTA(); // safety: ensure logo is up even if timeupdate was slightly late
+      if(holdTimer) clearTimeout(holdTimer);
+      holdTimer = setTimeout(function(){
+        holdTimer = null;
+        hideCTAInstant();
+        vid.currentTime = 0;
+        vid.play().catch(function(){});
+      }, HOLD_MS);
     });
   })();
 
