@@ -9,10 +9,9 @@
   <meta name="description" content="Build anything digital — fast, affordable, and built to solve real problems. Modern websites, apps, games, branding, AI &amp; crypto solutions." />
   <meta name="theme-color" content="#1a0b2e" />
 
-  <!-- ── Favicon &amp; App Icons ─────────────────────────── -->
-  <link rel="icon" type="image/png" sizes="32x32" href="openflow-transparent-logo.png?v=2" />
-  <link rel="icon" type="image/png" sizes="16x16" href="openflow-transparent-logo.png?v=2" />
-  <link rel="apple-touch-icon" sizes="180x180" href="openflow-transparent-logo.png?v=2" />
+  <!-- ── Favicon &amp; App Icons — inline base64 to bypass all caching ─── -->
+  <link rel="icon" type="image/png" href="data:image/png;base64,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" />
+  <link rel="apple-touch-icon" href="openflow-transparent-logo.png" />
 
   <!-- ── Open Graph — Facebook, Instagram, LinkedIn, WhatsApp ── -->
   <meta property="og:title" content="Openflow — Build Anything Digital" />
@@ -369,8 +368,8 @@
 
   <!-- LOADER: maintenance video plays immediately, CTA floats over hand-splash area -->
   <div id="loader">
-    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" fetchpriority="high"></video>
-    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto"></video>
+    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" loop fetchpriority="high"></video>
+    <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto" loop></video>
 
     <!-- Social icons: Facebook + Instagram — top right corner -->
     <div id="social-icons">
@@ -699,20 +698,19 @@
     }
   })();
 
-  /* ── STEP 1B: CTA — fades in 0.25s before video ends, holds 6s on last frame, snaps off, loops ── */
+  /* ── STEP 1B: CTA — fades in 3s before loop end, snaps off on loop, video never pauses ── */
   (function(){
     var isMobile = window.matchMedia('(max-width:768px)').matches;
     var vid = document.getElementById(isMobile ? 'maint-vid-mob' : 'maint-vid');
     var cta = document.getElementById('deck-cta');
     if(!vid || !cta) return;
 
-    var SHOW_BEFORE_END = 0.25; // seconds before end to fade logo in
-    var HOLD_MS         = 6000; // ms to hold last frame with logo visible
+    var SHOW_BEFORE_END = 3; // seconds before the loop resets to show the logo
 
     var showTime      = null;
+    var prevTime      = 0;
     var ctaVisible    = false;
     var shownThisLoop = false;
-    var holdTimer     = null;
 
     function calcShowTime(){
       if(vid.duration && isFinite(vid.duration)){
@@ -733,8 +731,9 @@
       cta.style.pointerEvents = 'auto';
     }
 
-    /* ── Instant snap-off, no fade ── */
+    /* ── Instant snap-off on loop reset ── */
     function hideCTAInstant(){
+      if(!ctaVisible) return;
       ctaVisible    = false;
       shownThisLoop = false;
       cta.style.transition    = 'none';
@@ -742,23 +741,20 @@
       cta.style.pointerEvents = 'none';
     }
 
-    /* Show logo 0.25s before natural end */
     vid.addEventListener('timeupdate', function(){
-      if(!shownThisLoop && showTime !== null && vid.currentTime >= showTime){
+      var t = vid.currentTime;
+
+      /* Loop detected: time jumped backward — snap logo off, ready for next cycle */
+      if(prevTime > 0.5 && t < prevTime - 0.5){
+        hideCTAInstant();
+      }
+
+      /* Show logo 3s before the loop end */
+      if(!shownThisLoop && showTime !== null && t >= showTime){
         showCTA();
       }
-    });
 
-    /* Video ends → freeze on last frame, hold 6s, then snap logo off and restart */
-    vid.addEventListener('ended', function(){
-      showCTA(); // safety: ensure logo is up even if timeupdate was slightly late
-      if(holdTimer) clearTimeout(holdTimer);
-      holdTimer = setTimeout(function(){
-        holdTimer = null;
-        hideCTAInstant();
-        vid.currentTime = 0;
-        vid.play().catch(function(){});
-      }, HOLD_MS);
+      prevTime = t;
     });
   })();
 
