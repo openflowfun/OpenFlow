@@ -52,20 +52,21 @@
     #maint-vid,#maint-vid-mob{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     #maint-vid-mob{display:none}
 
-    /* ── CTA DECK BUTTON (image) ── */
+    /* ── CTA DECK BUTTON — Click.png on the palm, JS-controlled visibility ── */
     #deck-cta{
-      position:absolute;left:16%;top:22%;z-index:20;
+      position:absolute;
+      left:29%;top:32%; /* palm center — 2 steps right of previous 27% */
+      margin-left:-50px;margin-top:-50px; /* centres the 100px image on that exact point */
       text-decoration:none;display:block;
-      opacity:0;transform:translateY(20px) scale(.9);
-      animation:ctaReveal .7s cubic-bezier(.34,1.56,.64,1) 2.2s forwards,ctaFloat 4.5s ease-in-out 2.9s infinite;
-      filter:drop-shadow(0 0 24px rgba(0,136,255,.5));
-      transition:filter .35s;
+      opacity:0;pointer-events:none; /* hidden by default — JS reveals it */
+      animation:ctaFloat 4s ease-in-out infinite; /* gentle float always runs */
+      filter:drop-shadow(0 0 14px rgba(255,255,255,.28));
+      transition:opacity .8s ease, filter .35s;
+      z-index:20;
     }
-    #deck-cta:hover{filter:drop-shadow(0 0 44px rgba(0,240,255,.78));}
-    .cta-img{width:150px;height:150px;display:block;border-radius:50%;transition:transform .3s;}
-    #deck-cta:hover .cta-img{transform:scale(1.07);}
-    @keyframes ctaReveal{to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes ctaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+    #deck-cta:hover{filter:drop-shadow(0 0 28px rgba(255,255,255,.6));}
+    .cta-img{width:100px;height:100px;display:block;}
+    @keyframes ctaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
     /* ── SOCIAL ICONS (loader overlay, top-right) ── */
     #social-icons{
@@ -102,17 +103,10 @@
         background:#000 !important;
       }
       #deck-cta{
-        left:50%;top:auto;bottom:22%;
-        animation:ctaRevealMob .7s cubic-bezier(.34,1.56,.64,1) 2.2s forwards,ctaFloatMob 4.5s ease-in-out 2.9s infinite;
+        left:38%;top:32%;bottom:auto;
+        margin-left:-45px;margin-top:-45px;
       }
-      @keyframes ctaRevealMob{
-        from{opacity:0;transform:translateX(-50%) translateY(20px) scale(.9)}
-        to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
-      }
-      @keyframes ctaFloatMob{
-        0%,100%{transform:translateX(-50%) translateY(0)}
-        50%{transform:translateX(-50%) translateY(-9px)}
-      }
+      .cta-img{width:90px;height:90px;}
       #social-icons{top:16px;right:16px;gap:9px;}
       .soc-icon{width:40px;height:40px;border-radius:11px;}
     }
@@ -138,7 +132,8 @@
     /* NAV */
     #nav{position:fixed;top:0;left:0;right:0;z-index:9000;padding:28px 56px;display:flex;align-items:center;justify-content:space-between;transition:all .4s var(--ease)}
     #nav.solid{background:rgba(10,4,24,.9);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);padding:14px 56px;border-bottom:1px solid rgba(255,255,255,.05);box-shadow:0 4px 48px rgba(0,0,0,.42)}
-    .nav-logo{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--c),var(--b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;letter-spacing:-.5px}
+    .nav-logo{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:#fff;-webkit-text-fill-color:#fff;text-decoration:none;letter-spacing:-.5px;transition:opacity .25s}
+    .nav-logo:hover{opacity:.75}
     .nav-links{display:flex;list-style:none;gap:40px}
     .nav-links a{color:rgba(255,255,255,.52);text-decoration:none;font-size:.875rem;font-weight:500;transition:color .25s;position:relative}
     .nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:1px;background:var(--c);transform:scaleX(0);transition:transform .25s}
@@ -710,7 +705,7 @@
     }
   })();
 
-  /* ── STEP 1B: CTA — fade out on loop, fade in 3s after hand rises ── */
+  /* ── STEP 1B: CTA — hidden at start, shown only when hand fully up, auto-hides after 6s ── */
   (function(){
     var isMobile = window.matchMedia('(max-width:768px)').matches;
     var vid = document.getElementById(isMobile ? 'maint-vid-mob' : 'maint-vid');
@@ -718,51 +713,60 @@
     if(!vid || !cta) return;
 
     /*
-     * ⏱  HAND_RAISE_TIME — seconds into each loop when Flow's hand starts rising.
-     *    Open the video in any player, find the moment the hand lifts, note the timestamp.
-     *    Default: 1.4 s  (adjust as needed)
+     * ⏱  HAND_FULLY_UP_TIME — seconds into each loop when the hand is fully raised
+     *    and the still-with-waves phase begins.
+     *    Open the video in any player, find that exact moment, update this value.
+     *    Default: 2.0 s
      *
-     * ⏱  HAND_SHOW_DELAY — milliseconds to wait AFTER the hand reaches HAND_RAISE_TIME
-     *    before fading the CTA in. Default: 3000 ms (3 seconds).
+     * ⏱  SHOW_DURATION — how long (ms) the logo stays visible before fading away.
+     *    Default: 6000 ms (6 seconds)
      */
-    var HAND_RAISE_TIME  = 1.4;
-    var HAND_SHOW_DELAY  = 3000;
+    var HAND_FULLY_UP_TIME = 3.0;
+    var SHOW_DURATION      = 6000;
 
-    var prevTime    = 0;
-    var ctaHidden   = false;
-    var ready       = false; // true once the initial CSS reveal animation has finished
-    var showTimer   = null;  // pending setTimeout for delayed re-show
+    var prevTime      = 0;
+    var ctaVisible    = false;
+    var shownThisLoop = false; // blocks re-show after auto-hide within same loop
+    var hideTimer     = null;
 
-    // Initial reveal runs for ~3 s (2.2 s delay + 0.7 s duration + small buffer)
-    setTimeout(function(){ ready = true; }, 3100);
+    function showCTA(){
+      if(ctaVisible) return;
+      ctaVisible    = true;
+      shownThisLoop = true;
+      cta.style.transition    = 'opacity 0.8s ease';
+      cta.style.opacity       = '1';
+      cta.style.pointerEvents = 'auto';
+      // Auto-fade after SHOW_DURATION
+      hideTimer = setTimeout(hideCTA, SHOW_DURATION);
+    }
 
     function hideCTA(){
-      if(ctaHidden || !ready) return;
-      // Cancel any pending show timer (loop restarted before delay completed)
-      if(showTimer){ clearTimeout(showTimer); showTimer = null; }
-      ctaHidden = true;
-      cta.style.transition    = 'opacity 0.45s ease';
+      hideTimer = null;
+      if(!ctaVisible) return;
+      ctaVisible = false;
+      cta.style.transition    = 'opacity 0.7s ease';
       cta.style.opacity       = '0';
       cta.style.pointerEvents = 'none';
     }
 
-    function showCTA(){
-      showTimer = null;
-      if(!ctaHidden) return;
-      ctaHidden = false;
-      cta.style.transition    = 'opacity 0.75s ease';
-      cta.style.opacity       = '1';
-      cta.style.pointerEvents = 'auto';
-    }
-
     vid.addEventListener('timeupdate', function(){
       var t = vid.currentTime;
-      // Loop detected: time jumped backward by > 0.5 s
-      if(prevTime > 0.8 && t < prevTime - 0.5) hideCTA();
-      // Hand rising: schedule re-show HAND_SHOW_DELAY ms after reaching the target timestamp
-      if(ctaHidden && !showTimer && t >= HAND_RAISE_TIME){
-        showTimer = setTimeout(showCTA, HAND_SHOW_DELAY);
+
+      // Loop detected: time jumped backward — reset for the new cycle
+      if(prevTime > 0.8 && t < prevTime - 0.5){
+        if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
+        ctaVisible    = false;
+        shownThisLoop = false;
+        cta.style.transition    = 'opacity 0.3s ease';
+        cta.style.opacity       = '0';
+        cta.style.pointerEvents = 'none';
       }
+
+      // Hand fully up & waving: reveal the logo (once per loop only)
+      if(!shownThisLoop && t >= HAND_FULLY_UP_TIME){
+        showCTA();
+      }
+
       prevTime = t;
     });
   })();
