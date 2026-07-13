@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Openflow — Build Anything Digital</title>
+  <title>openflow</title>
 
   <!-- ── Basic Meta ─────────────────────────────────── -->
   <meta name="description" content="Build anything digital — fast, affordable, and built to solve real problems. Modern websites, apps, games, branding, AI &amp; crypto solutions." />
   <meta name="theme-color" content="#1a0b2e" />
 
   <!-- ── Favicon &amp; App Icons ─────────────────────────── -->
-  <link rel="icon" href="og-image.png" type="image/png" />
-  <link rel="apple-touch-icon" href="og-image.png" />
+  <link rel="icon" href="openflow-transparent-logo.png" type="image/png" />
+  <link rel="apple-touch-icon" href="openflow-transparent-logo.png" />
 
   <!-- ── Open Graph — Facebook, Instagram, LinkedIn, WhatsApp ── -->
   <meta property="og:title" content="Openflow — Build Anything Digital" />
@@ -30,9 +30,13 @@
   <meta name="twitter:description" content="Modern websites, apps, games, branding, AI integrations, crypto solutions — fast, affordable." />
   <meta name="twitter:image" content="https://openflow.fun/og-image.png" />
 
+  <!-- Performance: preconnect + preload critical assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Preload CTA image so it's ready before the hand raise -->
+  <link rel="preload" as="image" href="Click.png" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -44,8 +48,8 @@
       --ease:cubic-bezier(.4,0,.2,1);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{font-family:'Inter',sans-serif;background:var(--bg1);color:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    html{scroll-behavior:smooth;overflow:hidden}
+    body{font-family:'Inter',sans-serif;background:var(--bg1);color:#fff;overflow:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
     /* LOADER */
     #loader{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:99999}
@@ -55,11 +59,12 @@
     /* ── CTA DECK BUTTON — Click.png on the palm, JS-controlled visibility ── */
     #deck-cta{
       position:absolute;
-      left:29%;top:32%; /* palm center — 2 steps right of previous 27% */
-      margin-left:-50px;margin-top:-50px; /* centres the 100px image on that exact point */
+      left:29%;top:32%;
+      margin-left:-50px;margin-top:-50px;
       text-decoration:none;display:block;
-      opacity:0;pointer-events:none; /* hidden by default — JS reveals it */
-      animation:ctaFloat 4s ease-in-out infinite; /* gentle float always runs */
+      opacity:0;pointer-events:none;
+      will-change:opacity; /* GPU-composited fade — no layout/paint cost */
+      animation:ctaFloat 4s ease-in-out infinite;
       filter:drop-shadow(0 0 14px rgba(255,255,255,.28));
       transition:opacity .8s ease, filter .35s;
       z-index:20;
@@ -69,9 +74,11 @@
     @keyframes ctaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
     /* ── SOCIAL ICONS (loader overlay, top-right) ── */
+    @keyframes socialIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     #social-icons{
       position:absolute;top:22px;right:22px;z-index:30;
       display:flex;gap:11px;
+      opacity:0;animation:socialIn .45s ease .25s forwards;
     }
     .soc-icon{
       display:flex;align-items:center;justify-content:center;
@@ -361,7 +368,7 @@
 
   <!-- LOADER: maintenance video plays immediately, CTA floats over hand-splash area -->
   <div id="loader">
-    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" loop></video>
+    <video id="maint-vid"     src="UnderMaintenance.mp4"       autoplay muted playsinline preload="auto" loop fetchpriority="high"></video>
     <video id="maint-vid-mob" src="MobileUnderMaintenance.mp4" autoplay muted playsinline preload="auto" loop></video>
 
     <!-- Social icons: Facebook + Instagram — top right corner -->
@@ -398,21 +405,7 @@
   <!-- NAV -->
   <nav id="nav">
     <a href="#" class="nav-logo">openflow</a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#work">Work</a></li>
-      <li><a href="#contact" class="nav-cta">Get Started</a></li>
-    </ul>
-    <button class="hamburger" id="ham" aria-label="Menu"><span></span><span></span><span></span></button>
   </nav>
-  <div id="mob-nav">
-    <a href="#" class="mob-link" id="mob-x" style="font-size:1.6rem;opacity:.4">✕ close</a>
-    <a href="#about"    class="mob-link">About</a>
-    <a href="#services" class="mob-link">Services</a>
-    <a href="#work"     class="mob-link">Work</a>
-    <a href="#contact"  class="mob-link grad">Get Started →</a>
-  </div>
 
   <!-- HERO SCENE -->
   <div id="scene-wrap">
@@ -705,7 +698,7 @@
     }
   })();
 
-  /* ── STEP 1B: CTA — hidden at start, shown only when hand fully up, auto-hides after 6s ── */
+  /* ── STEP 1B: CTA — appears 0.25s before each loop end (hand final wave), hides on loop reset ── */
   (function(){
     var isMobile = window.matchMedia('(max-width:768px)').matches;
     var vid = document.getElementById(isMobile ? 'maint-vid-mob' : 'maint-vid');
@@ -713,38 +706,42 @@
     if(!vid || !cta) return;
 
     /*
-     * ⏱  HAND_FULLY_UP_TIME — seconds into each loop when the hand is fully raised
-     *    and the still-with-waves phase begins.
-     *    Open the video in any player, find that exact moment, update this value.
-     *    Default: 2.0 s
-     *
-     * ⏱  SHOW_DURATION — how long (ms) the logo stays visible before fading away.
-     *    Default: 6000 ms (6 seconds)
+     * ⏱  SHOW_BEFORE_END — seconds before the video loop resets at which to show the logo.
+     *    0.25 = logo appears 0.25 s before the hand movement fully ends each cycle.
+     *    Increase this number to show it earlier in the wave phase.
      */
-    var HAND_FULLY_UP_TIME = 3.0;
-    var SHOW_DURATION      = 6000;
+    var SHOW_BEFORE_END = 0.25;
 
+    var showTime      = null;  // vid.duration - SHOW_BEFORE_END, set once metadata loads
     var prevTime      = 0;
     var ctaVisible    = false;
-    var shownThisLoop = false; // blocks re-show after auto-hide within same loop
-    var hideTimer     = null;
+    var shownThisLoop = false;
 
+    /* ── Compute showTime from actual video duration (works even if already loaded) ── */
+    function calcShowTime(){
+      if(vid.duration && isFinite(vid.duration)){
+        showTime = Math.max(0, vid.duration - SHOW_BEFORE_END);
+      }
+    }
+    vid.addEventListener('loadedmetadata', calcShowTime);
+    vid.addEventListener('durationchange',  calcShowTime);
+    calcShowTime(); // immediate if metadata already cached
+
+    /* ── Fade in ── */
     function showCTA(){
       if(ctaVisible) return;
       ctaVisible    = true;
       shownThisLoop = true;
-      cta.style.transition    = 'opacity 0.8s ease';
+      cta.style.transition    = 'opacity 0.5s ease';
       cta.style.opacity       = '1';
       cta.style.pointerEvents = 'auto';
-      // Auto-fade after SHOW_DURATION
-      hideTimer = setTimeout(hideCTA, SHOW_DURATION);
     }
 
-    function hideCTA(){
-      hideTimer = null;
+    /* ── Fade out ── */
+    function hideCTA(fast){
       if(!ctaVisible) return;
       ctaVisible = false;
-      cta.style.transition    = 'opacity 0.7s ease';
+      cta.style.transition    = fast ? 'opacity 0.2s ease' : 'opacity 0.5s ease';
       cta.style.opacity       = '0';
       cta.style.pointerEvents = 'none';
     }
@@ -752,18 +749,14 @@
     vid.addEventListener('timeupdate', function(){
       var t = vid.currentTime;
 
-      // Loop detected: time jumped backward — reset for the new cycle
-      if(prevTime > 0.8 && t < prevTime - 0.5){
-        if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
-        ctaVisible    = false;
+      /* Loop detected: time jumped backward — reset for the new cycle */
+      if(prevTime > 0.5 && t < prevTime - 0.5){
         shownThisLoop = false;
-        cta.style.transition    = 'opacity 0.3s ease';
-        cta.style.opacity       = '0';
-        cta.style.pointerEvents = 'none';
+        hideCTA(true); // snap away instantly on loop so next appearance feels fresh
       }
 
-      // Hand fully up & waving: reveal the logo (once per loop only)
-      if(!shownThisLoop && t >= HAND_FULLY_UP_TIME){
+      /* Show the logo at SHOW_BEFORE_END seconds before the loop end */
+      if(!shownThisLoop && showTime !== null && t >= showTime){
         showCTA();
       }
 
