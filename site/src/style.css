@@ -100,7 +100,7 @@ main,footer{position:relative;z-index:2}
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:130px var(--pad) 90px;z-index:2}
 .hero__grid{width:100%;display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:40px}
-.hero__title{font-size:clamp(44px,7.2vw,124px);font-weight:600;letter-spacing:-.035em;line-height:.98;margin:26px 0 28px}
+.hero__title{font-size:clamp(44px,min(7.2vw,12.5vh),124px);font-weight:600;letter-spacing:-.035em;line-height:.98;margin:26px 0 28px}
 .hero__title .line{display:block;overflow:hidden;padding-bottom:.06em}
 .hero__title .word{display:inline-block;will-change:transform}
 .hero__sub{max-width:560px;color:#b4c3dc;font-size:clamp(16px,1.25vw,19px)}
@@ -150,7 +150,8 @@ main,footer{position:relative;z-index:2}
 /* ---------- pillars (horizontal) ---------- */
 .pillars{position:relative;z-index:2}
 .pillars__pin{height:100vh;display:flex;align-items:center;gap:60px;padding:0 0 0 var(--pad);overflow:hidden}
-.pillars__head{flex:0 0 min(400px,32vw)}
+.pillars__head{flex:0 0 min(420px,34vw);position:relative;z-index:3;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding-right:40px;background:linear-gradient(90deg,var(--bg) 0%,var(--bg) 82%,rgba(3,5,12,0) 100%)}
+.pillars__head::before{content:"";position:absolute;left:calc(-1 * var(--pad));top:0;bottom:0;width:var(--pad);background:var(--bg)}
 .pillars__head .muted{margin-top:20px;max-width:340px}
 .pillars__progress{margin-top:40px;width:180px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
 .pillars__progress span{display:block;height:100%;width:0;background:var(--grad)}
@@ -260,7 +261,7 @@ main,footer{position:relative;z-index:2}
 /* ---------- web3 ---------- */
 .web3__grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,90px);align-items:center;max-width:1500px;margin:0 auto}
 .web3__visual{position:relative}
-.web3__visual img{position:relative;z-index:2;width:100%;filter:drop-shadow(0 30px 80px rgba(34,195,230,.35))}
+.web3__visual img{position:relative;z-index:2;width:100%;-webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 98%);mask-image:linear-gradient(to bottom,#000 70%,transparent 98%);filter:drop-shadow(0 30px 80px rgba(34,195,230,.35))}
 .web3__ring{position:absolute;inset:6% 12%;border-radius:50%;border:1px solid rgba(123,232,212,.25);box-shadow:0 0 120px rgba(10,108,240,.35) inset;animation:spin 30s linear infinite}
 .web3__list{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px}
 .w3item{padding:20px;border:1px solid var(--line);border-radius:16px;background:rgba(10,18,36,.45);transition:border-color .3s,transform .4s var(--ease)}
@@ -316,7 +317,7 @@ main,footer{position:relative;z-index:2}
 .footer__nav{display:grid;grid-template-columns:repeat(2,auto);gap:10px 40px;color:var(--muted)}
 .footer__nav a:hover,.footer__contact a:hover{color:var(--b3)}
 .footer__contact{display:grid;gap:8px;color:var(--muted)}
-.footer__word{font-family:var(--fd);font-weight:700;font-size:clamp(80px,21vw,360px);letter-spacing:-.05em;line-height:.85;margin:60px 0 20px;text-align:center;background:linear-gradient(180deg,rgba(123,232,212,.55),rgba(10,108,240,.08) 85%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;user-select:none}
+.footer__word{font-family:var(--fd);font-weight:700;font-size:clamp(64px,17vw,300px);letter-spacing:-.05em;line-height:.85;margin:60px 0 20px;text-align:center;background:linear-gradient(180deg,rgba(123,232,212,.55),rgba(10,108,240,.08) 85%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;user-select:none}
 .footer__bottom{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:var(--muted)}
 .totop:hover{color:var(--b3)}
 
@@ -335,7 +336,8 @@ main,footer{position:relative;z-index:2}
   .chip--b{right:-2%}
   .leaks,.why__grid{grid-template-columns:1fr 1fr}
   .pillars__pin{height:auto;flex-direction:column;align-items:stretch;padding:100px var(--pad);gap:40px}
-  .pillars__head{flex:none}
+  .pillars__head{flex:none;background:none;padding-right:0}
+  .pillars__head::before{display:none}
   .pillars__progress{display:none}
   .pillars__track{flex-direction:column;padding-right:0;transform:none!important}
   .pillar,.pillar--beyond{flex:none;min-height:0}
