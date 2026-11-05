@@ -1,5 +1,17 @@
 name = "openflow"
-compatibility_date = "2024-10-14"
+main = "worker/index.js"
+compatibility_date = "2025-10-01"
 
 [assets]
-directory = "."
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "404-page"
+run_worker_first = ["/api/*"]
+
+[vars]
+# Where contact-form submissions are delivered (comma-separate for several inboxes)
+CONTACT_TO = "openflow.ink@gmail.com"
+# Must be a Resend-verified sender. onboarding@resend.dev works until openflow.fun is verified in Resend.
+CONTACT_FROM = "openflow website <onboarding@resend.dev>"
+
+# Secret (set in Cloudflare dashboard, never commit): RESEND_API_KEY
