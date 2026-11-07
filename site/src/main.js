@@ -320,6 +320,48 @@ if (finePointer && !reduced) {
   window.addEventListener('pointermove', e => { const n = e.clientX / innerWidth - 0.5; hx(n * 30); hr(n * 8); }, { passive: true });
 }
 
+/* ---------------- Live website scroll previews ---------------- */
+const cases = $$('.case');
+function sizeScrolls() {
+  cases.forEach(c => {
+    const img = $('.case__scroll', c), scr = $('.case__screen', c);
+    if (!img || !scr || !img.naturalHeight) return;
+    const d = img.offsetHeight - scr.offsetHeight;
+    img.style.setProperty('--d', `-${Math.max(0, d)}px`);
+    img.style.setProperty('--dur', `${Math.max(12, Math.min(26, d / 70))}s`);
+  });
+}
+cases.forEach(c => { const img = $('.case__scroll', c); if (img) { img.loading = 'eager'; img.decode?.().then(sizeScrolls).catch(() => {}); img.addEventListener('load', sizeScrolls); } });
+window.addEventListener('resize', sizeScrolls, { passive: true });
+const caseIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('in-view', e.isIntersecting)), { threshold: 0.25 });
+cases.forEach(c => caseIO.observe(c));
+
+/* ---------------- Content slideshow ---------------- */
+(() => {
+  const root = $('#contentSlider'); if (!root) return;
+  const slides = $$('.slide', root), dots = $('#sliderDots');
+  let i = 0, timer = null, visible = false, hover = false;
+  slides.forEach((_, k) => { const b = document.createElement('button'); b.setAttribute('aria-label', 'Show slide ' + (k + 1)); b.addEventListener('click', () => go(k)); dots.appendChild(b); });
+  function render() {
+    const n = slides.length;
+    slides.forEach((s, k) => {
+      s.classList.remove('is-active', 'is-prev', 'is-next');
+      if (k === i) s.classList.add('is-active');
+      else if (k === (i - 1 + n) % n) s.classList.add('is-prev');
+      else if (k === (i + 1) % n) s.classList.add('is-next');
+    });
+    [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
+  }
+  function go(k) { i = (k + slides.length) % slides.length; render(); restart(); }
+  function restart() { clearInterval(timer); if (visible && !hover && !document.hidden) timer = setInterval(() => { i = (i + 1) % slides.length; render(); }, 2000); }
+  slides.forEach((s, k) => s.addEventListener('click', () => { if (s.classList.contains('is-prev') || s.classList.contains('is-next')) go(k); }));
+  root.addEventListener('pointerenter', () => { hover = true; restart(); });
+  root.addEventListener('pointerleave', () => { hover = false; restart(); });
+  document.addEventListener('visibilitychange', restart);
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; restart(); }, { threshold: 0.2 }).observe(root);
+  render();
+})();
+
 /* ---------------- Form modal ---------------- */
 const modal = $('#formModal');
 const slot = $('#modalSlot');
