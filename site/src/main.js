@@ -23,7 +23,7 @@ lenis.on('scroll', (e) => { ScrollTrigger.update(); scene?.setVelocity(e.velocit
 gsap.ticker.add((time) => lenis.raf(time * 1000));
 gsap.ticker.lagSmoothing(0);
 
-$$('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => {
+$$('a[href^="#"]:not([data-open-form])').forEach(a => a.addEventListener('click', (e) => {
   const id = a.getAttribute('href');
   if (id.length < 2) return;
   const el = $(id);
@@ -198,8 +198,13 @@ mm.add('(min-width: 1101px)', () => {
       onUpdate: s => { $('#pillarsBar').style.width = (s.progress * 100) + '%'; }
     }
   });
-  $$('.pillar', track).forEach(card => {
-    gsap.from(card, { opacity: 0.25, scale: 0.92, rotateY: -14, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 95%', end: 'left 55%', scrub: true } });
+  $$('.pillar', track).forEach((card, i) => {
+    gsap.fromTo(card, { opacity: 0.2, scale: 0.86, rotateY: -28, rotateZ: 3, y: 60, filter: 'blur(6px)' },
+      { opacity: 1, scale: 1, rotateY: 0, rotateZ: 0, y: 0, filter: 'blur(0px)', ease: 'none',
+        scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 100%', end: 'left 60%', scrub: true } });
+    const art = card.querySelector('.pa');
+    if (art) gsap.fromTo(art, { yPercent: 18, scale: 1.08 }, { yPercent: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 100%', end: 'left 45%', scrub: true } });
+    ScrollTrigger.create({ trigger: card, containerAnimation: tween, start: 'left 85%', end: 'right 30%', toggleClass: 'is-on' });
   });
 
   // method: draw path + fly Flow along it + light steps
@@ -295,6 +300,31 @@ if (finePointer && !reduced) {
   const hr = gsap.quickTo(hf, 'rotateY', { duration: 1.2, ease: 'power3' });
   window.addEventListener('pointermove', e => { const n = e.clientX / innerWidth - 0.5; hx(n * 30); hr(n * 8); }, { passive: true });
 }
+
+/* ---------------- Form modal ---------------- */
+const modal = $('#formModal');
+const slot = $('#modalSlot');
+const formHome = document.createElement('div');
+function openForm() {
+  const f = $('#contactForm');
+  if (!f || modal.classList.contains('open')) return;
+  formHome.className = 'form-placeholder';
+  formHome.style.minHeight = f.offsetHeight + 'px';
+  f.parentNode.insertBefore(formHome, f);
+  slot.appendChild(f);
+  modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open'); lenis.stop();
+  setTimeout(() => f.querySelector('input[name=name]')?.focus({ preventScroll: true }), 450);
+}
+function closeForm() {
+  if (!modal.classList.contains('open')) return;
+  modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open'); lenis.start();
+  setTimeout(() => { const f = $('#contactForm'); if (formHome.parentNode) { formHome.replaceWith(f); } }, 500);
+}
+$$('[data-open-form]').forEach(b => b.addEventListener('click', (e) => { e.preventDefault(); e.stopImmediatePropagation(); openForm(); }, true));
+$$('[data-close-form]').forEach(b => b.addEventListener('click', closeForm));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeForm(); });
 
 /* ---------------- Contact form ---------------- */
 const form = $('#contactForm');
