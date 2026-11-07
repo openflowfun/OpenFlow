@@ -320,46 +320,90 @@ if (finePointer && !reduced) {
   window.addEventListener('pointermove', e => { const n = e.clientX / innerWidth - 0.5; hx(n * 30); hr(n * 8); }, { passive: true });
 }
 
-/* ---------------- Live website scroll previews ---------------- */
+/* ---------------- Live website scroll previews (with real video layers) ---------------- */
 const cases = $$('.case');
 function sizeScrolls() {
   cases.forEach(c => {
-    const img = $('.case__scroll', c), scr = $('.case__screen', c);
-    if (!img || !scr || !img.naturalHeight) return;
-    const d = img.offsetHeight - scr.offsetHeight;
-    img.style.setProperty('--d', `-${Math.max(0, d)}px`);
-    img.style.setProperty('--dur', `${Math.max(12, Math.min(26, d / 70))}s`);
+    const sc = $('.case__scroller', c), scr = $('.case__screen', c);
+    if (!sc || !scr) return;
+    const d = sc.offsetHeight - scr.offsetHeight;
+    sc.style.setProperty('--d', `-${Math.max(0, d)}px`);
+    sc.style.setProperty('--dur', `${Math.max(14, Math.min(28, d / 65))}s`);
   });
 }
-cases.forEach(c => { const img = $('.case__scroll', c); if (img) { img.loading = 'eager'; img.decode?.().then(sizeScrolls).catch(() => {}); img.addEventListener('load', sizeScrolls); } });
+cases.forEach(c => { const img = $('.case__scroll', c); if (img) { img.loading = 'eager'; img.addEventListener('load', sizeScrolls); if (img.complete) sizeScrolls(); } });
 window.addEventListener('resize', sizeScrolls, { passive: true });
-const caseIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('in-view', e.isIntersecting)), { threshold: 0.25 });
+const caseIO = new IntersectionObserver(es => es.forEach(e => {
+  const c = e.target; c.classList.toggle('in-view', e.isIntersecting);
+  $$('.case__vid', c).forEach(v => {
+    if (e.isIntersecting) { if (!v.src) { v.src = v.dataset.src; } v.play().catch(() => {}); }
+    else v.pause();
+  });
+  if (e.isIntersecting) sizeScrolls();
+}), { threshold: 0.15, rootMargin: '200px 0px' });
 cases.forEach(c => caseIO.observe(c));
 
-/* ---------------- Content slideshow ---------------- */
+/* ---------------- Content slideshow (images + videos, centre focus) ---------------- */
 (() => {
   const root = $('#contentSlider'); if (!root) return;
+  const stage = $('.slider__stage', root);
   const slides = $$('.slide', root), dots = $('#sliderDots');
+  slides.forEach(s => s.style.setProperty('--ar', s.dataset.ar || 1.5));
   let i = 0, timer = null, visible = false, hover = false;
   slides.forEach((_, k) => { const b = document.createElement('button'); b.setAttribute('aria-label', 'Show slide ' + (k + 1)); b.addEventListener('click', () => go(k)); dots.appendChild(b); });
+  const vidOf = s => s.querySelector('video');
+  function load(s) { const v = vidOf(s); if (v && !v.src) { v.src = v.dataset.src; v.preload = 'auto'; } }
   function render() {
-    const n = slides.length;
+    const n = slides.length, H = stage.clientHeight, W = stage.clientWidth;
+    const prev = (i - 1 + n) % n, next = (i + 1) % n;
+    const wOf = k => H * (+slides[k].dataset.ar || 1.5);
+    const aw = Math.min(wOf(i), W * 0.62), sideScale = W < 640 ? 0.62 : 0.72;
     slides.forEach((s, k) => {
       s.classList.remove('is-active', 'is-prev', 'is-next');
-      if (k === i) s.classList.add('is-active');
-      else if (k === (i - 1 + n) % n) s.classList.add('is-prev');
-      else if (k === (i + 1) % n) s.classList.add('is-next');
+      let tx = 0, sc = 0.55, op = 0, z = 1;
+      const sw = Math.min(wOf(k), W * 0.62);
+      s.style.height = (Math.min(wOf(k), W * 0.62) / (+s.dataset.ar || 1.5)) + 'px';
+      if (k === i) { s.classList.add('is-active'); sc = 1; op = 1; z = 3; }
+      else if (k === prev) { s.classList.add('is-prev'); tx = -(aw / 2 + (sw * sideScale) / 2 + 24); sc = sideScale; op = .85; z = 2; }
+      else if (k === next) { s.classList.add('is-next'); tx = (aw / 2 + (sw * sideScale) / 2 + 24); sc = sideScale; op = .85; z = 2; }
+      s.style.top = ((H - parseFloat(s.style.height)) / 2) + 'px';
+      s.style.transform = `translateX(calc(-50% + ${tx}px)) scale(${sc})`;
+      s.style.opacity = op; s.style.zIndex = z;
+      const v = vidOf(s);
+      if (v) { if (k === i || k === prev || k === next) load(s); if (k === i && visible) { v.currentTime = 0; v.play().catch(() => {}); } else v.pause(); }
     });
     [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
   }
-  function go(k) { i = (k + slides.length) % slides.length; render(); restart(); }
-  function restart() { clearInterval(timer); if (visible && !hover && !document.hidden) timer = setInterval(() => { i = (i + 1) % slides.length; render(); }, 2000); }
+  function dwell() { const v = vidOf(slides[i]); return v ? 6000 : 2000; }
+  function schedule() { clearTimeout(timer); if (visible && !hover && !document.hidden) timer = setTimeout(() => { i = (i + 1) % slides.length; render(); schedule(); }, dwell()); }
+  function go(k) { i = (k + slides.length) % slides.length; render(); schedule(); }
   slides.forEach((s, k) => s.addEventListener('click', () => { if (s.classList.contains('is-prev') || s.classList.contains('is-next')) go(k); }));
-  root.addEventListener('pointerenter', () => { hover = true; restart(); });
-  root.addEventListener('pointerleave', () => { hover = false; restart(); });
-  document.addEventListener('visibilitychange', restart);
-  new IntersectionObserver(es => { visible = es[0].isIntersecting; restart(); }, { threshold: 0.2 }).observe(root);
+  root.addEventListener('pointerenter', () => { hover = true; clearTimeout(timer); });
+  root.addEventListener('pointerleave', () => { hover = false; schedule(); });
+  document.addEventListener('visibilitychange', schedule);
+  window.addEventListener('resize', render, { passive: true });
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; render(); schedule(); }, { threshold: 0.2 }).observe(root);
   render();
+})();
+
+/* ---------------- Team reels ---------------- */
+(() => {
+  const members = $$('.member');
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    const v = $('.member__vid', e.target);
+    if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause();
+  }), { threshold: 0.3 });
+  members.forEach(m => io.observe(m));
+  $$('[data-sound]').forEach(b => b.addEventListener('click', () => {
+    const v = $('.member__vid', b.closest('.member'));
+    const turnOn = v.muted;
+    $$('.member__vid').forEach(o => { o.muted = true; }); $$('[data-sound]').forEach(o => { o.classList.remove('on'); o.innerHTML = '&#128263;'; });
+    if (turnOn) { v.muted = false; v.play().catch(() => {}); b.classList.add('on'); b.innerHTML = '&#128266;'; }
+  }));
+  const tick = () => $$('.member__clock').forEach(c => {
+    try { c.querySelector('b').textContent = new Intl.DateTimeFormat('en-NZ', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: c.dataset.tz }).format(new Date()); } catch (e) {}
+  });
+  tick(); setInterval(tick, 30000);
 })();
 
 /* ---------------- Form modal ---------------- */

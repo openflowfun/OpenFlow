@@ -17,6 +17,12 @@ dl c319693b-5b69-4709-8c69-01879b759744.webp public/assets/flow/build.webp
 dl 15db1a8b-951e-48dc-8293-42ba6df01a22.webp public/assets/flow/welcome.webp
 dl f9a91da1-83da-4536-b7fc-89c841acc0bc.webp public/assets/flow/web3.webp
 
+echo "→ Team reels"
+mkdir -p public/assets/team site/static/assets/team
+dl 0cc2af82-5ec0-42af-8e77-4261aad5c6b8.mp4 public/assets/team/shev-reel.mp4
+dl 83a98a3c-3b14-4f01-a532-2e6786591954.mp4 public/assets/team/maniya-reel.mp4
+cp public/assets/team/*.mp4 site/static/assets/team/
+
 echo "→ Portfolio + content images"
 TMP="$(mktemp -d)"
 curl -fsSL "$CDN/913bdcff-55f9-49eb-a4e4-6021cb7bf157.zip" -o "$TMP/of-assets.zip"
