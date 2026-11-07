@@ -86,15 +86,15 @@ function countUp(els) {
 
 /* ---------------- Scene choreography ---------------- */
 const SCENES = {
-  0: { shape: 0, offsetX: 2.6, tilt: 0.35, fade: 1 },
+  0: { shape: 0, offsetX: 0, tilt: 0.35, fade: 1 },
   1: { shape: 1, offsetX: 0, tilt: 0.1, fade: 0.75 },
-  2: { shape: 2, offsetX: 3.2, tilt: 0.2, fade: 0.85 },
+  2: { shape: 2, offsetX: 0, tilt: 0.2, fade: 0.85 },
   3: { shape: 3, offsetX: 0, tilt: 0.25, fade: 0.9 },
   4: { shape: 1, offsetX: 0, tilt: 0, fade: 0.35 },
-  5: { shape: 4, offsetX: 3, tilt: 0.9, fade: 0.7 },
-  6: { shape: 2, offsetX: -3, tilt: 0.2, fade: 0.9 },
+  5: { shape: 4, offsetX: 0, tilt: 0.9, fade: 0.7 },
+  6: { shape: 2, offsetX: 0, tilt: 0.2, fade: 0.9 },
   7: { shape: 4, offsetX: 0, tilt: 1.2, fade: 0.8 },
-  8: { shape: 0, offsetX: -2.4, tilt: 0.5, fade: 0.9 }
+  8: { shape: 0, offsetX: 0, tilt: 0.5, fade: 0.9 }
 };
 if (scene) {
   $$('[data-scene]').forEach(sec => {

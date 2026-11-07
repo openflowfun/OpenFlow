@@ -127,7 +127,7 @@ export function createScene(canvas) {
   const uniforms = {
     uTime: { value: 0 }, uW: { value: [1, 0, 0, 0, 0] }, uSize: { value: isMobile ? 3.2 : 2.8 }, uPR: { value: PR },
     uMouse: { value: new Vector2() }, uVel: { value: 0 }, uFade: { value: 0 },
-    uC1: { value: new Color('#0a6cf0') }, uC2: { value: new Color('#22c3e6') }, uC3: { value: new Color('#7be8d4') }
+    uC1: { value: new Color('#2563EB') }, uC2: { value: new Color('#06B6D4') }, uC3: { value: new Color('#22D3EE') }
   };
   const mat = new ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms, transparent: true, depthWrite: false, blending: AdditiveBlending });
   const points = new Points(geo, mat);
@@ -135,7 +135,7 @@ export function createScene(canvas) {
   scene.add(points);
 
   // targets the page drives
-  const state = { shape: 0, offsetX: isMobile ? 0 : 2.6, offsetY: 0, tilt: 0.35, mouse: new Vector2(), vel: 0, fade: 1 };
+  const state = { shape: 0, offsetX: 0, offsetY: 0, tilt: 0.35, mouse: new Vector2(), vel: 0, fade: 1 };
   const cur = { w: [1, 0, 0, 0, 0], ox: state.offsetX, oy: 0, tilt: state.tilt, mouse: new Vector2(), vel: 0 };
 
   function resize() {
