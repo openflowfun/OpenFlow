@@ -13,6 +13,20 @@ const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matc
 if (reduced) document.documentElement.classList.add('reduced');
 $('#year').textContent = new Date().getFullYear();
 
+/* ---------------- Remember scroll position (refresh / returning to tab) ---------------- */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+const SCROLL_KEY = 'of-scroll:' + location.pathname;
+let savedScroll = 0;
+try {
+  const nav = performance.getEntriesByType('navigation')[0];
+  const type = nav ? nav.type : 'navigate';
+  if ((type === 'reload' || type === 'back_forward') && !location.hash) savedScroll = +sessionStorage.getItem(SCROLL_KEY) || 0;
+} catch (e) {}
+const saveScroll = () => { try { sessionStorage.setItem(SCROLL_KEY, String(Math.round(window.scrollY))); } catch (e) {} };
+window.addEventListener('pagehide', saveScroll);
+document.addEventListener('visibilitychange', () => { if (document.hidden) saveScroll(); });
+let saveT; window.addEventListener('scroll', () => { clearTimeout(saveT); saveT = setTimeout(saveScroll, 250); }, { passive: true });
+
 /* ---------------- WebGL ---------------- */
 const scene = createScene($('#gl'));
 
@@ -38,7 +52,7 @@ $$('a[href^="#"]:not([data-open-form])').forEach(a => a.addEventListener('click'
 /* ---------------- Preloader ---------------- */
 function preload() {
   const bar = $('#loaderBar'), pct = $('#loaderPct');
-  const imgs = ['/assets/flow/hero.webp', '/assets/logo-word.webp'];
+  const imgs = ['/assets/flow/hero.webp?v=2', '/assets/logo-word.webp'];
   let done = 0; const total = imgs.length + 1;
   let shown = 0, target = 0;
   const tick = () => {
@@ -51,7 +65,7 @@ function preload() {
   const step = () => { done++; target = (done / total) * 100; };
   const ps = imgs.map(src => new Promise(r => { const i = new Image(); i.onload = i.onerror = () => { step(); r(); }; i.src = src; }));
   ps.push(document.fonts.ready.then(step));
-  const min = new Promise(r => setTimeout(r, 1100));
+  const min = new Promise(r => setTimeout(r, savedScroll > 0 ? 300 : 1100));
   const max = new Promise(r => setTimeout(r, 4500));
   return Promise.race([Promise.all([...ps, min]), max]).then(() => { target = 100; return new Promise(r => setTimeout(r, 350)); });
 }
@@ -60,6 +74,11 @@ preload().then(() => {
   $('#loader').classList.add('done');
   document.body.classList.remove('is-loading');
   lenis.start();
+  if (savedScroll > 0) {
+    ScrollTrigger.refresh();
+    lenis.scrollTo(savedScroll, { immediate: true, force: true });
+    requestAnimationFrame(() => { ScrollTrigger.refresh(); lenis.scrollTo(savedScroll, { immediate: true, force: true }); });
+  }
   intro();
   setTimeout(() => $('#loader')?.remove(), 1400);
 });
