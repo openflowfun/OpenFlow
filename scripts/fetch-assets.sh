@@ -12,7 +12,7 @@ dl() { curl -fsSL "$CDN/$1" -o "$2"; echo "  ✓ $2"; }
 
 echo "→ Flow mascot renders"
 dl 88e4f14b-cc43-402b-98cf-3a4da4c8c715.webp public/assets/flow/hero.webp
-dl 5b8e5de8-6127-4b18-9da8-983208c531b4.webp public/assets/flow/fly.webp
+dl acb66e66-cc0f-447d-8854-7ffc1acbc599.webp public/assets/flow/fly.webp
 dl c319693b-5b69-4709-8c69-01879b759744.webp public/assets/flow/build.webp
 dl 15db1a8b-951e-48dc-8293-42ba6df01a22.webp public/assets/flow/welcome.webp
 dl f9a91da1-83da-4536-b7fc-89c841acc0bc.webp public/assets/flow/web3.webp
