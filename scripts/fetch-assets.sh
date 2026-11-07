@@ -11,11 +11,11 @@ done
 dl() { curl -fsSL "$CDN/$1" -o "$2"; echo "  ✓ $2"; }
 
 echo "→ Flow mascot renders"
-dl 49432cfd-ee25-42be-b3c5-84be7a1d9979.webp public/assets/flow/hero.webp
-dl 35c438ff-773a-47dd-bcb3-2a64fc53cdaa.webp public/assets/flow/fly.webp
-dl 5c3a53ec-8310-4bf0-99d8-a3c4baf56768.webp public/assets/flow/build.webp
-dl c0c7ecce-e2a3-4078-8ce0-213cd1c06a6d.webp public/assets/flow/welcome.webp
-dl b99b6c87-fd87-490d-b904-3854f2ee34ce.webp public/assets/flow/web3.webp
+dl 88e4f14b-cc43-402b-98cf-3a4da4c8c715.webp public/assets/flow/hero.webp
+dl 5b8e5de8-6127-4b18-9da8-983208c531b4.webp public/assets/flow/fly.webp
+dl c319693b-5b69-4709-8c69-01879b759744.webp public/assets/flow/build.webp
+dl 15db1a8b-951e-48dc-8293-42ba6df01a22.webp public/assets/flow/welcome.webp
+dl f9a91da1-83da-4536-b7fc-89c841acc0bc.webp public/assets/flow/web3.webp
 
 echo "→ Portfolio + content images"
 TMP="$(mktemp -d)"
